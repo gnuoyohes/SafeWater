@@ -13,4 +13,6 @@ export default {
   noticeText: '#fff',
   connectButton: 'lightgreen',
   disconnectButton: 'lightcoral',
+  spinner: tintColor,
+  values: tintColor,
 };

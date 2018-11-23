@@ -1,9 +1,12 @@
 import React from 'react';
-import { TextInput, StyleSheet, Text, View, Alert, Modal, NativeEventEmitter, NativeModules } from 'react-native';
+import { TextInput, StyleSheet, Text, View, Alert, NativeEventEmitter, NativeModules } from 'react-native';
 import Button from 'react-native-button';
+import BleManager from 'react-native-ble-manager';
+import { BlurView } from 'react-native-blur';
+
 import Colors from '../constants/Colors';
 import Globals from '../constants/Globals.js';
-import BleManager from 'react-native-ble-manager';
+import LoadingScreen from './LoadingScreen.js';
 
 const bleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(bleManagerModule);
@@ -19,7 +22,7 @@ export default class HomeScreen extends React.Component {
       sensor4Data: 0,
       sensor5Data: 0,
       connected: false,
-      modalVisible: false,
+      loadingVisible: false,
     };
 
     this._handleUpdateValueForCharacteristic = this._handleUpdateValueForCharacteristic.bind(this);
@@ -50,13 +53,13 @@ export default class HomeScreen extends React.Component {
       sensor2Data: floatArray[1],
       sensor3Data: floatArray[2],
       sensor4Data: floatArray[3],
-      sensor5Data: floatArray[4]
+      sensor5Data: floatArray[4],
     });
   }
 
   _handleConnect() {
     if (this.state.connected) {
-      this.setState({modalVisible: true});
+      this.setState({loadingVisible: true});
       BleManager.disconnect(Globals.bluno_UUID)
         .then(() => {
           this.setState({
@@ -66,20 +69,23 @@ export default class HomeScreen extends React.Component {
             sensor4Data: 0,
             sensor5Data: 0,
             connected: false,
-            modalVisible: false
+            loadingVisible: false,
           });
           // Alert.alert('Device disconnected');
         })
         .catch((error) => {
+          this.setState({loadingVisible: false});
           Alert.alert(error);
         });
-      this.setState({modalVisible: false});
+      setTimeout(() => {
+        this.setState({loadingVisible: false});
+      }, 5000);
     }
     else {
-      this.setState({modalVisible: true});
+      this.setState({loadingVisible: true});
       BleManager.connect(Globals.bluno_UUID)
         .then(() => {
-          this.setState({connected: true, modalVisible: false});
+          this.setState({connected: true, loadingVisible: false});
           // Alert.alert('Connected to device');
           BleManager.retrieveServices(Globals.bluno_UUID)
             .then((peripheralInfo) => {
@@ -88,16 +94,21 @@ export default class HomeScreen extends React.Component {
                 .catch((error) => {});
             })
             .catch((error) => {
+              this.setState({loadingVisible: false});
               Alert.alert(error);
             });
         })
         .catch((error) => {
+          this.setState({loadingVisible: false});
           Alert.alert(error);
         });
+      setTimeout(() => {
+        this.setState({loadingVisible: false});
+      }, 5000);
     }
   }
 
-  _handleButtonPress() {
+  _handleGetData() {
     BleManager.retrieveServices(Globals.bluno_UUID)
       .then((peripheralInfo) => {
         BleManager.write(Globals.bluno_UUID, Globals.service_UUID, Globals.characteristic_UUID, [1])
@@ -109,16 +120,13 @@ export default class HomeScreen extends React.Component {
       });
   }
 
+  _handleSubmitData() {
+    return;
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Modal
-          style={styles.modal}
-          transparent={false}
-          visible={this.state.modalVisible}
-        >
-          <Text style={styles.modalText}> Loading </Text>
-        </Modal>
         <View style={styles.buttonContainer}>
           <Button
             style={{fontSize: 20, color: 'white'}}
@@ -131,7 +139,7 @@ export default class HomeScreen extends React.Component {
           <Button
             style={{fontSize: 20, color: 'white'}}
             containerStyle={styles.buttonStyle}
-            onPress={() => this._handleButtonPress()}>
+            onPress={() => this._handleGetData()}>
             Get Data
           </Button>
         </View>
@@ -140,69 +148,72 @@ export default class HomeScreen extends React.Component {
             <Text style={styles.getStartedText}>
               Temperature
             </Text>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              value={this.state.sensor1Data.toString()}
-              editable={false}
-            />
+            <Text style={styles.valueText}>
+              {this.state.sensor1Data.toString()}
+            </Text>
           </View>
           <View style={styles.dataLineContainer}>
             <Text style={styles.getStartedText}>
               TDS
             </Text>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              value={this.state.sensor2Data.toString()}
-              editable={false}
-            />
+            <Text style={styles.valueText}>
+              {this.state.sensor2Data.toString()}
+            </Text>
           </View>
           <View style={styles.dataLineContainer}>
             <Text style={styles.getStartedText}>
               Turbidity
             </Text>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              value={this.state.sensor3Data.toString()}
-              editable={false}
-            />
+            <Text style={styles.valueText}>
+              {this.state.sensor3Data.toString()}
+            </Text>
           </View>
           <View style={styles.dataLineContainer}>
             <Text style={styles.getStartedText}>
               pH
             </Text>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              value={this.state.sensor4Data.toString()}
-              editable={false}
-            />
+            <Text style={styles.valueText}>
+              {this.state.sensor4Data.toString()}
+            </Text>
           </View>
           <View style={styles.dataLineContainer}>
             <Text style={styles.getStartedText}>
               ORP
             </Text>
-            <TextInput
-              style={{height: 40, borderColor: 'gray', borderWidth: 1}}
-              value={this.state.sensor5Data.toString()}
-              editable={false}
-            />
+            <Text style={styles.valueText}>
+              {this.state.sensor5Data.toString()}
+            </Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              style={{fontSize: 20, color: 'white'}}
+              containerStyle={styles.buttonStyle}
+              onPress={() => this._handleSubmitData()}>
+              Submit
+            </Button>
           </View>
         </View>
+        {this.state.loadingVisible ?
+          <BlurView
+            style={styles.blurView}
+            blurType='light'
+            blurAmount={10}
+          />
+          : null
+        }
+      <LoadingScreen visible={this.state.loadingVisible}/>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  modal: {
-    color: 'rgba(10,10,10, 0.3)',
-  },
-  modalText: {
-    paddingTop: 100,
-    textAlign: 'center',
-    fontSize: 30,
-  },
-  spinner: {
-    marginBottom: 50
+  blurView: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   container: {
     paddingTop: 30,
@@ -219,11 +230,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   getStartedContainer: {
-    alignItems: 'center',
     marginHorizontal: 50,
   },
   getStartedText: {
-    fontSize: 17,
+    fontSize: 20,
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',
@@ -257,7 +267,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.disconnectButton,
   },
   dataLineContainer: {
-    padding: 5,
+    alignItems: 'center',
+    paddingTop: 12,
     width: 200,
+  },
+  valueText: {
+    paddingTop: 3,
+    fontSize: 15,
+    color: Colors.values,
   }
 });
