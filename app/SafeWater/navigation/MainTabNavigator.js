@@ -7,7 +7,10 @@ import HomeScreen from '../screens/HomeScreen';
 import MapScreen from '../screens/MapScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
+import Colors from '../constants/Colors';
+
 const HomeStack = createStackNavigator({
+  // Home: { screen : props => <HomeScreen {...props} database={db} /> },
   Home: HomeScreen,
 });
 
@@ -24,6 +27,7 @@ HomeStack.navigationOptions = {
 };
 
 const MapStack = createStackNavigator({
+  // Map: { screen : props => <MapScreen {...props} database={db} /> },
   Map: MapScreen,
 });
 
@@ -51,8 +55,15 @@ SettingsStack.navigationOptions = {
   ),
 };
 
-export default createBottomTabNavigator({
-  HomeStack,
-  MapStack,
-  SettingsStack,
-});
+export default createBottomTabNavigator(
+  {
+    HomeStack,
+    MapStack,
+    SettingsStack,
+  },
+  {
+    tabBarOptions: {
+      activeTintColor: Colors.tintColor,
+    },
+  }
+);

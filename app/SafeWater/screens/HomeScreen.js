@@ -5,14 +5,20 @@ import BleManager from 'react-native-ble-manager';
 import { BlurView } from 'react-native-blur';
 
 import Colors from '../constants/Colors';
-import Globals from '../constants/Globals.js';
-import LoadingScreen from './LoadingScreen.js';
+import Globals from '../constants/Globals';
+import LoadingScreen from './LoadingScreen';
+import Database from '../constants/Database';
 
 const bleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(bleManagerModule);
 
 
 export default class HomeScreen extends React.Component {
+
+  static navigationOptions = {
+    header: null,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -27,10 +33,6 @@ export default class HomeScreen extends React.Component {
 
     this._handleUpdateValueForCharacteristic = this._handleUpdateValueForCharacteristic.bind(this);
   }
-
-  static navigationOptions = {
-    header: null,
-  };
 
   componentDidMount() {
     // initialize the BLE module
@@ -121,7 +123,28 @@ export default class HomeScreen extends React.Component {
   }
 
   _handleSubmitData() {
-    return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        var time = position.timestamp.toFixed(0);
+        var lat = position.coords.latitude;
+        var long = position.coords.longitude;
+        Database.database.ref('data').child(time).set({
+          'lat': lat,
+          'long': long,
+          'sensorData': [
+            this.state.sensor1Data,
+            this.state.sensor2Data,
+            this.state.sensor3Data,
+            this.state.sensor4Data,
+            this.state.sensor5Data,
+          ]
+        });
+      },
+      (error) => {
+        Alert.alert(error);
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 5000 },
+    );
   }
 
   render() {
