@@ -29,6 +29,7 @@ export default class HomeScreen extends React.Component {
       sensor5Data: 0,
       connected: false,
       loadingVisible: false,
+      diagnostic: "Safe",
     };
 
     this._handleUpdateValueForCharacteristic = this._handleUpdateValueForCharacteristic.bind(this);
@@ -129,6 +130,7 @@ export default class HomeScreen extends React.Component {
         var lat = position.coords.latitude;
         var long = position.coords.longitude;
         Database.database.ref('data').child(time).set({
+          'diagnostic': this.state.diagnostic,
           'lat': lat,
           'long': long,
           'sensorData': [
@@ -172,7 +174,7 @@ export default class HomeScreen extends React.Component {
               Temperature
             </Text>
             <Text style={styles.valueText}>
-              {this.state.sensor1Data.toString()}
+              {this.state.sensor1Data.toString()} &#176;C
             </Text>
           </View>
           <View style={styles.dataLineContainer}>
@@ -180,7 +182,7 @@ export default class HomeScreen extends React.Component {
               TDS
             </Text>
             <Text style={styles.valueText}>
-              {this.state.sensor2Data.toString()}
+              {this.state.sensor2Data.toString()} ppm
             </Text>
           </View>
           <View style={styles.dataLineContainer}>
@@ -188,7 +190,7 @@ export default class HomeScreen extends React.Component {
               Turbidity
             </Text>
             <Text style={styles.valueText}>
-              {this.state.sensor3Data.toString()}
+              {this.state.sensor3Data.toString()} NTU
             </Text>
           </View>
           <View style={styles.dataLineContainer}>
@@ -204,9 +206,12 @@ export default class HomeScreen extends React.Component {
               ORP
             </Text>
             <Text style={styles.valueText}>
-              {this.state.sensor5Data.toString()}
+              {this.state.sensor5Data.toString()} mV
             </Text>
           </View>
+          <Text style={this.state.diagnostic == 'Safe' ? styles.safeStyle : styles.notSafeStyle}>
+            {this.state.diagnostic}
+          </Text>
           <View style={styles.buttonContainer}>
             <Button
               style={{fontSize: 20, color: 'white'}}
@@ -256,13 +261,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 50,
   },
   getStartedText: {
-    fontSize: 20,
+    fontSize: 15,
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',
   },
   buttonContainer: {
-    paddingTop: 30,
+    paddingTop: 20,
     alignItems: 'center',
   },
   buttonStyle: {
@@ -291,12 +296,22 @@ const styles = StyleSheet.create({
   },
   dataLineContainer: {
     alignItems: 'center',
-    paddingTop: 12,
+    paddingTop: 8,
     width: 200,
   },
   valueText: {
     paddingTop: 3,
     fontSize: 15,
     color: Colors.values,
+  },
+  safeStyle: {
+    paddingTop: 10,
+    fontSize: 30,
+    color: Colors.safe
+  },
+  notSafeStyle: {
+    paddingTop: 10,
+    fontSize: 30,
+    color: Colors.notSafe
   }
 });

@@ -13,6 +13,11 @@ export default {
   noticeText: '#fff',
   connectButton: 'lightgreen',
   disconnectButton: 'lightcoral',
+  deleteButton: 'lightcoral',
   spinner: tintColor,
   values: tintColor,
+  safePinColor: 'lightgreen',
+  notSafePinColor: 'lightcoral',
+  safe: 'lightgreen',
+  notSafe: 'lightcoral'
 };
