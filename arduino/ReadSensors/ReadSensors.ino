@@ -97,25 +97,25 @@ void loop() {
     }
   }   
 
-  
-  static unsigned long printTimepoint = millis();
-  if(millis()-printTimepoint > 800U)    // every 800 milliseconds print values
-  {
-    printTimepoint = millis();
-    
-    
-    
-    Serial.print("Temp: ");
-    Serial.print(temperature.f, 2);
-    Serial.print(" TDS: ");
-    Serial.println(tdsValue.f, 2);
-    Serial.print(" Turb: ");
-    Serial.println(turbValue.f, 2);
-    Serial.print(" pH: ");
-    Serial.println(phValue.f, 2);
-    Serial.print(" ORP: ");
-    Serial.println(orpValue.f, 2);
-  }
+  // debugging
+//  static unsigned long printTimepoint = millis();
+//  if(millis()-printTimepoint > 800U)    // every 800 milliseconds print values
+//  {
+//    printTimepoint = millis();
+//    
+//    
+//    
+//    Serial.print("Temp: ");
+//    Serial.print(temperature.f, 2);
+//    Serial.print(" TDS: ");
+//    Serial.println(tdsValue.f, 2);
+//    Serial.print(" Turb: ");
+//    Serial.println(turbValue.f, 2);
+//    Serial.print(" pH: ");
+//    Serial.println(phValue.f, 2);
+//    Serial.print(" ORP: ");
+//    Serial.println(orpValue.f, 2);
+//  }
 }
 
 //////// helper functions ////////
