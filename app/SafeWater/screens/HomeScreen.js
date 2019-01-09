@@ -51,12 +51,23 @@ export default class HomeScreen extends React.Component {
 
   _handleUpdateValueForCharacteristic(data) {
     floatArray = new Float32Array(new Uint8Array(data["value"]).buffer);
+    var temp = floatArray[0];
+    var tds = floatArray[1];
+    var turb = floatArray[2];
+    var ph = floatArray[3];
+    var orp = floatArray[4];
+    var diag = "Safe";
+    if (temp < 5 || temp > 35) diag = "Not Safe";
+    if (tds > 500) diag = "Not Safe";
+    if (turb > 5) diag = "Not Safe";
+    if (ph < 6.5 || ph > 8.5) diag = "Not Safe";
     this.setState({
-      sensor1Data: floatArray[0],
-      sensor2Data: floatArray[1],
-      sensor3Data: floatArray[2],
-      sensor4Data: floatArray[3],
-      sensor5Data: floatArray[4],
+      sensor1Data: temp,
+      sensor2Data: tds,
+      sensor3Data: turb,
+      sensor4Data: ph,
+      sensor5Data: orp,
+      diagnostic: diag
     });
   }
 

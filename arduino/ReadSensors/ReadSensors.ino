@@ -67,7 +67,10 @@ void loop() {
     // turbidity
     turbSensorValue = analogRead(TurbSensorPin);
     turbVoltage = turbSensorValue * (5.0/1024.0);
-    turbValue.f = -1120.4*turbVoltage*turbVoltage + 5742.3*turbVoltage - 4352.9;
+    if (turbVoltage < 2.5)
+      turbValue.f = 30;
+    else
+      turbValue.f = (-1120.4*turbVoltage*turbVoltage + 5742.3*turbVoltage - 4352.9)/100;
 
     // TDS
     analogSampleTimepoint = millis();
@@ -99,22 +102,23 @@ void loop() {
 
   // debugging
 //  static unsigned long printTimepoint = millis();
-//  if(millis()-printTimepoint > 800U)    // every 800 milliseconds print values
+//  if(millis()-printTimepoint > 1000U)    // every 800 milliseconds print values
 //  {
 //    printTimepoint = millis();
 //    
 //    
 //    
 //    Serial.print("Temp: ");
-//    Serial.print(temperature.f, 2);
+//    Serial.println(temperature.f, 2);
 //    Serial.print(" TDS: ");
 //    Serial.println(tdsValue.f, 2);
-//    Serial.print(" Turb: ");
+//    Serial.print("Turb: ");
 //    Serial.println(turbValue.f, 2);
-//    Serial.print(" pH: ");
+//    Serial.print("  pH: ");
 //    Serial.println(phValue.f, 2);
 //    Serial.print(" ORP: ");
 //    Serial.println(orpValue.f, 2);
+//    Serial.println();
 //  }
 }
 
